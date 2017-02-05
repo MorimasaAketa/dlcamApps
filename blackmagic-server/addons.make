@@ -1,0 +1,3 @@
+ofxArgParser
+ofxBlackmagic2
+ofxTurboJpeg
