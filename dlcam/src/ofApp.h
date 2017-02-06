@@ -1,14 +1,12 @@
 #pragma once
 
 
-#define HOST "localhost" // 受信側のIPアドレス
-#define PORT 8000 // 受信側のポート番号
 
 
 #include "ofxBlackmagic.h"
 #include "ofMain.h"
-#include "ofxTurboJpeg.h"
-#include "ofxOsc.h"
+#include "controlApp.h"
+
 
 
 
@@ -30,10 +28,10 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 	
 		vector<shared_ptr<ofxBlackmagic::Input> > inputs;
-		ofxTurboJpeg turbo;
-		ofPixels pix720;
-		ofTexture tex720, tex2160;
-		ofFbo fbo;
-		ofxOscSender sender;
-		int64_t img_count;
+		ofTexture tex2160;
+		
+		ofFbo fbo, fbo2160;
+	
+
+		shared_ptr<controlApp> control;
 };

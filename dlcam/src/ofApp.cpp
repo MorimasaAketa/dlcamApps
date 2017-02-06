@@ -15,15 +15,18 @@ void ofApp::setup(){
 
 		this->inputs.push_back(input);
 	}
-	sender.setup(HOST, PORT);
-	img_count = 0;
 	ofBackground(0);
+	
+	tex2160.allocate(3840, 2160, GL_RGBA);
+	control->tex2160 = tex2160;
 
 
-	fbo.allocate(1280, 720, GL_RGBA);
+	fbo2160.allocate(3840, 2160, GL_RGBA);
 	fbo.begin();
 	ofClear(0, 0, 255, 255);
-	fbo.end();
+	fbo2160.end();
+
+	control->mainFbo = fbo2160;
 }
 
 //--------------------------------------------------------------
@@ -35,37 +38,14 @@ void ofApp::update(){
 	ofImage imgbuf, img720;
 	ofBuffer jpegbuf;
 
-	tex720.clear();
-	tex720.allocate(1280, 720, GL_RGB);
 	for (auto input : this->inputs) {
 		if(input->isFrameNew()){
-	
-			fbo.begin();
-			ofClear(0, 255);
-
-			ofSetColor(255);
-
-			//imgbuf.setFromPixels(input->getPixels());
+			control->isFrameNew = true;
+			tex2160.clear();
 			tex2160 = input->getTexture(); // faster?
-			//imgbuf.draw(0, 0, 1280, 720);
-			tex2160.draw(0, 0, 1280, 720);
-			fbo.end();
-			fbo.readToPixels(pix720);
-			img720.setFromPixels(pix720);
-
-			//turbo.save(jpegbuf, pix720, 90);
-
-			//turbo.save(&img720, "turbo.jpg", 75);
-
-			// bool fileWritten = ofBufferToFile("img.jpg", jpegbuf);
-			img_count++;
-			ofxOscMessage m;
-			m.setAddress("/pose/jpeg");
-			m.addInt64Arg(img_count);
-//			m.addBlobArg(jpegbuf);
-//			sender.sendMessage(m);
-			//ofLogNotice() << "img size:" << &jpegbuf.size();
-//			ofLogNotice() << "img count:" << img_count;
+			fbo2160.begin();
+			tex2160.draw(0, 0, 3840, 2160);
+			fbo2160.end();
 		}
 	}
 
@@ -81,14 +61,13 @@ void ofApp::draw(){
 	float width = 3840; float height = 2160;
 
 	for (auto input : this->inputs) {
-		fbo.draw(0, 0, 1280, 720);
+		//fbo2160.draw(0, 0, 1920, 1080);
+		fbo2160.draw(-1920, -1080, 3840, 2160);
 	}
 	if (this->inputs.empty()) {
 		ofDrawBitmapString("No BlackMagic input devices found", 20, 20);
 	}
-	ofImage img;
-	img.grabScreen(0, 0, 1280, 720);
-	//turbo.save(&img, "turbograbbed.jpg", 80);
+	
 }
 
 //--------------------------------------------------------------

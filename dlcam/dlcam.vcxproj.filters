@@ -46,6 +46,9 @@
     <ClCompile Include="..\..\..\addons\ofxTurboJpeg\src\ofxTurboJpeg.cpp">
       <Filter>other</Filter>
     </ClCompile>
+    <ClCompile Include="src\controlApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -80,9 +83,6 @@
     </Filter>
     <Filter Include="other">
       <UniqueIdentifier>{A2230F47-9F6B-908F-FF0E-E006}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\TurboJpegIO">
-      <UniqueIdentifier>{7355952b-43bf-4818-8527-1029655528ff}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\addons\ofxTurboJpeg\src\ofxTurboJpeg.h">
       <Filter>other</Filter>
+    </ClInclude>
+    <ClInclude Include="src\controlApp.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
