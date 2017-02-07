@@ -1,2 +1,4 @@
+ofxGui
 ofxOsc
 ofxTurboJpeg
+ofxZmq
