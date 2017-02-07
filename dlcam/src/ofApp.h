@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "controlApp.h"
 
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -39,10 +40,7 @@ class ofApp : public ofBaseApp{
 		// crop size < 3830, 2160
 		// crop size > 1920, 1080
 
-	
-		
-		
-
+		vector<vector<ofVec3f>> currentBodies;
 	
 
 		ofVec2f positionMousePressed;

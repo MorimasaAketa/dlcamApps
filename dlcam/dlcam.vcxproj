@@ -95,8 +95,8 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>..\..\..\addons\ofxBlackmagic2\src\ofxBlackMagic\vs\;..\..\..\addons\ofxBlackmagic2\src;%(AdditionalIncludeDirectories);src;src\TurboJpegIO;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxTurboJpeg\src\;..\..\..\addons\ofxTurboJpeg\libs\turbo-jpeg\include;..\..\..\addons\ofxZmq\libs;..\..\..\addons\ofxZmq\libs\zmq;..\..\..\addons\ofxZmq\libs\zmq\include;..\..\..\addons\ofxZmq\libs\zmq\src;..\..\..\addons\ofxZmq\src</AdditionalIncludeDirectories>
-      <CompileAs>Default</CompileAs>
+      <AdditionalIncludeDirectories>..\..\..\addons\ofxBlackmagic2\src\ofxBlackMagic\vs;..\..\..\addons\ofxBlackmagic2\src;%(AdditionalIncludeDirectories);src;src\TurboJpegIO;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxJSON\libs;..\..\..\addons\ofxJSON\libs\jsoncpp;..\..\..\addons\ofxJSON\libs\jsoncpp\include;..\..\..\addons\ofxJSON\libs\jsoncpp\include\json;..\..\..\addons\ofxJSON\libs\jsoncpp\src;..\..\..\addons\ofxJSON\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxTurboJpeg\src\;..\..\..\addons\ofxTurboJpeg\libs\turbo-jpeg\include;..\..\..\addons\ofxZmq\libs;..\..\..\addons\ofxZmq\libs\zmq;..\..\..\addons\ofxZmq\libs\zmq\include;..\..\..\addons\ofxZmq\libs\zmq\src;..\..\..\addons\ofxZmq\src</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -114,7 +114,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\TurboJpegIO;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxTurboJpeg\src\;..\..\..\addons\ofxTurboJpeg\libs\turbo-jpeg\include;..\..\..\addons\ofxZmq\libs;..\..\..\addons\ofxZmq\libs\zmq;..\..\..\addons\ofxZmq\libs\zmq\include;..\..\..\addons\ofxZmq\libs\zmq\src;..\..\..\addons\ofxZmq\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\TurboJpegIO;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxJSON\libs;..\..\..\addons\ofxJSON\libs\jsoncpp;..\..\..\addons\ofxJSON\libs\jsoncpp\include;..\..\..\addons\ofxJSON\libs\jsoncpp\include\json;..\..\..\addons\ofxJSON\libs\jsoncpp\src;..\..\..\addons\ofxJSON\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxTurboJpeg\src\;..\..\..\addons\ofxTurboJpeg\libs\turbo-jpeg\include;..\..\..\addons\ofxZmq\libs;..\..\..\addons\ofxZmq\libs\zmq;..\..\..\addons\ofxZmq\libs\zmq\include;..\..\..\addons\ofxZmq\libs\zmq\src;..\..\..\addons\ofxZmq\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -133,7 +133,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\TurboJpegIO;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxTurboJpeg\src\;..\..\..\addons\ofxTurboJpeg\libs\turbo-jpeg\include;..\..\..\addons\ofxZmq\libs;..\..\..\addons\ofxZmq\libs\zmq;..\..\..\addons\ofxZmq\libs\zmq\include;..\..\..\addons\ofxZmq\libs\zmq\src;..\..\..\addons\ofxZmq\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\TurboJpegIO;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxJSON\libs;..\..\..\addons\ofxJSON\libs\jsoncpp;..\..\..\addons\ofxJSON\libs\jsoncpp\include;..\..\..\addons\ofxJSON\libs\jsoncpp\include\json;..\..\..\addons\ofxJSON\libs\jsoncpp\src;..\..\..\addons\ofxJSON\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxTurboJpeg\src\;..\..\..\addons\ofxTurboJpeg\libs\turbo-jpeg\include;..\..\..\addons\ofxZmq\libs;..\..\..\addons\ofxZmq\libs\zmq;..\..\..\addons\ofxZmq\libs\zmq\include;..\..\..\addons\ofxZmq\libs\zmq\src;..\..\..\addons\ofxZmq\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -155,7 +155,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\TurboJpegIO;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxTurboJpeg\src\;..\..\..\addons\ofxTurboJpeg\libs\turbo-jpeg\include;..\..\..\addons\ofxZmq\libs;..\..\..\addons\ofxZmq\libs\zmq;..\..\..\addons\ofxZmq\libs\zmq\include;..\..\..\addons\ofxZmq\libs\zmq\src;..\..\..\addons\ofxZmq\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;src\TurboJpegIO;..\..\..\addons\ofxGui\src;..\..\..\addons\ofxJSON\libs;..\..\..\addons\ofxJSON\libs\jsoncpp;..\..\..\addons\ofxJSON\libs\jsoncpp\include;..\..\..\addons\ofxJSON\libs\jsoncpp\include\json;..\..\..\addons\ofxJSON\libs\jsoncpp\src;..\..\..\addons\ofxJSON\src;..\..\..\addons\ofxOsc\libs;..\..\..\addons\ofxOsc\libs\oscpack;..\..\..\addons\ofxOsc\libs\oscpack\src;..\..\..\addons\ofxOsc\libs\oscpack\src\ip;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\posix;..\..\..\addons\ofxOsc\libs\oscpack\src\ip\win32;..\..\..\addons\ofxOsc\libs\oscpack\src\osc;..\..\..\addons\ofxOsc\src;..\..\..\addons\ofxTurboJpeg\src\;..\..\..\addons\ofxTurboJpeg\libs\turbo-jpeg\include;..\..\..\addons\ofxZmq\libs;..\..\..\addons\ofxZmq\libs\zmq;..\..\..\addons\ofxZmq\libs\zmq\include;..\..\..\addons\ofxZmq\libs\zmq\src;..\..\..\addons\ofxZmq\src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
@@ -183,6 +183,8 @@
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSlider.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.cpp" />
     <ClCompile Include="..\..\..\addons\ofxGui\src\ofxToggle.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxJSON\src\ofxJSONElement.cpp" />
+    <ClCompile Include="..\..\..\addons\ofxJSON\libs\jsoncpp\src\jsoncpp.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscBundle.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscMessage.cpp" />
     <ClCompile Include="..\..\..\addons\ofxOsc\src\ofxOscParameterSync.cpp" />
@@ -296,6 +298,10 @@
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSlider.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxSliderGroup.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxToggle.h" />
+    <ClInclude Include="..\..\..\addons\ofxJSON\src\ofxJSON.h" />
+    <ClInclude Include="..\..\..\addons\ofxJSON\src\ofxJSONElement.h" />
+    <ClInclude Include="..\..\..\addons\ofxJSON\libs\jsoncpp\include\json\json-forwards.h" />
+    <ClInclude Include="..\..\..\addons\ofxJSON\libs\jsoncpp\include\json\json.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOsc.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscArg.h" />
     <ClInclude Include="..\..\..\addons\ofxOsc\src\ofxOscBundle.h" />
