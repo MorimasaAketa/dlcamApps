@@ -106,11 +106,8 @@ void controlApp::parseLatestPose() {
 	currentBodies.resize(0);
 
 	vector<ofVec3f> joints;
-	ofVec2f min, max;
-	min.set(100, 100);
-	max.set(200, 300);
-	ofLogNotice() << "initial min: " << min.x << ', ' << min.y;
-	ofLogNotice() << "initial max: " << max.x << ', ' << max.y;
+	ofVec2f min(0,0), max(0,0);
+
 
 
 	sceneUpperLeft = min;
@@ -138,8 +135,11 @@ void controlApp::parseLatestPose() {
 		}
 		min.x = max.x;		
 		min.y = max.y;
+
 		for (int j = 0; j < DLNJOINTS; j++) {
-			
+			if ( joints[j] == ofVec3f::zero() ) {
+				continue;
+			}
 			if (joints[j].x < min.x) {
 				min.x = joints[j].x;
 			}
@@ -147,8 +147,7 @@ void controlApp::parseLatestPose() {
 				min.y = joints[j].y;
 			}
 		}
-		ofLogNotice() << "min: " << min.x << ', ' << min.y;
-		
+
 		dlBody body;
 		body.setup();
 		copy(joints.begin(), joints.end(), body.joints.begin());
