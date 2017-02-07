@@ -47,4 +47,6 @@ class ofApp : public ofBaseApp{
 	
 
 		shared_ptr<controlApp> control;
+
+		bool drawBounds;
 };

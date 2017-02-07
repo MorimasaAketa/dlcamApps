@@ -30,7 +30,7 @@ void ofApp::setup() {
 	control->mainFbo = fbo2160;
 	cropCenter.set(1920, 1080);
 	cropSize.set(3840, 2160);
-
+	drawBounds = false;
 }
 
 //--------------------------------------------------------------
@@ -89,6 +89,20 @@ void ofApp::draw() {
 		ofDrawBitmapString("No BlackMagic input devices found", 20, 20);
 	}
 
+	if (drawBounds && control->currentNBody) {
+		ofPushMatrix();
+		ofSetColor(ofColor::yellow);
+		ofNoFill();
+		ofSetLineWidth(3);
+		ofScale(1920.0 / 1280.0, 1080.0 / 720.0, 1.0);
+		ofDrawRectangle(control->sceneUpperLeft.x, control->sceneUpperLeft.y,
+			control->sceneLowerRight.x - control->sceneUpperLeft.x,
+			control->sceneLowerRight.y - control->sceneUpperLeft.y);
+		ofSetColor(255);
+		ofPopMatrix();
+	}
+
+
 }
 //--------------------------------------------------------------
 bool ofApp::checkCropConstraint(ofVec2f center, ofVec2f size) {
@@ -135,6 +149,9 @@ void ofApp::keyPressed(int key) {
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
+	if (key == 'b') {
+		drawBounds = !drawBounds;
+	}
 
 }
 
