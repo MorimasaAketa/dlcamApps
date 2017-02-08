@@ -12,18 +12,26 @@ public:
 	void draw();
 	void keyPressed(int key);
 	void cropToBounds();
+	void updateCrop(ofVec4f centerSize);
 	ofVec4f calcCrop();
 	ofVec4f keepViewPort(ofVec4f centerSize);
 
 	vector<ofxDatGuiComponent*> components;
 	ofxDatGuiTextInput* status;
+	ofxDatGuiSlider* zoomSlider;
 	ofxDatGuiSlider* stabilizeSlider;
-
-	void onResetButtonEvent(ofxDatGuiButtonEvent e);
-	void onCropToBoundsButtonEvent(ofxDatGuiButtonEvent e);
-
+	ofxDatGuiSlider* autoZoomSpeedSlider;
+	ofxDatGuiToggle* autoZoomInToggle;
+	ofxDatGuiToggle* autoZoomOutToggle;
+	
 	void onZoomSliderEvent(ofxDatGuiSliderEvent e);
 	void onStabilizeSliderEvent(ofxDatGuiSliderEvent e);
+	void onResetButtonEvent(ofxDatGuiButtonEvent e);
+	void onCropToBoundsButtonEvent(ofxDatGuiButtonEvent e);
+	void onAutoZoomSpeedSliderEvent(ofxDatGuiSliderEvent e);
+	void onAutoZoomInToggleEvent(ofxDatGuiToggleEvent e);
+	void onAutoZoomOutToggleEvent(ofxDatGuiToggleEvent e);
+	void onShowBoundsToggleEvent(ofxDatGuiToggleEvent e);
 
 	void onToggleEvent(ofxDatGuiToggleEvent e);
 	void onSliderEvent(ofxDatGuiSliderEvent e);
@@ -34,10 +42,12 @@ public:
 	void onTextInputEvent(ofxDatGuiTextInputEvent e);
 
 	float cropWidth, cropUpperLeftX, cropUpperLeftY, zoom1Max, stabilize;
-	ofVec4f lastCenterSize;
+	float autoZoomSpeed;
+	bool drawBounds, autoZoomIn, autoZoomOut;
+
+	ofVec4f lastCenterSize, autoZoomCenterSize;
 
 	shared_ptr<rtPoseApp> rtPose;
-	bool drawBounds;
 
 };
 

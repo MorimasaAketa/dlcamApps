@@ -35,6 +35,7 @@ void rtPoseApp::setup() {
 
 	currentBodies.resize(0);
 	timeLatestPose = false;
+	detectionOn = true;
 }
 
 void rtPoseApp::update() {
@@ -73,7 +74,7 @@ void rtPoseApp::update() {
 void rtPoseApp::draw() {
 	//tex2160.draw(0, 0, 1280, 720);
 	fbo.draw(0, 0, 1280, 720);
-	if (shouldWrite && !ackWaiting) {
+	if (detectionOn && shouldWrite && !ackWaiting) {
 		ofImage img;
 		img.grabScreen(0, 0, 1280, 720);
 		turbo.save(&img, "turbograbbed.jpg", 80);

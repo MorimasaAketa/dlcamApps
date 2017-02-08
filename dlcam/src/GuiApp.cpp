@@ -16,35 +16,58 @@ void GuiApp::setup(){
 
 	status = new ofxDatGuiTextInput("status", "waiting for detection...");
 	status->setPosition(x, y);
+	
 	//component->onTextInputEvent(this, &ofApp::onTextInputEvent);
 	components.push_back(status);
-
 	y += status->getHeight() + p;
-	component = new ofxDatGuiSlider("ZOOM", 0, 100, 0);
-	component->setPosition(x, y);
-	component->onSliderEvent(this, &GuiApp::onZoomSliderEvent);
-	components.push_back(component);
+	
+	zoomSlider = new ofxDatGuiSlider("ZOOM", 0, 100, 0);
+	zoomSlider->setPosition(x, y);
+	zoomSlider->onSliderEvent(this, &GuiApp::onZoomSliderEvent);
+	components.push_back(zoomSlider);
+	y += zoomSlider->getHeight() + p;
 
-	stabilizeSlider = new ofxDatGuiSlider("STABILIZE", 0, 100, 0);
-	y += stabilizeSlider->getHeight() + p;
+	stabilizeSlider = new ofxDatGuiSlider("STABILIZE", 0, 1080, 0);
 	stabilizeSlider->setPosition(x, y);
 	stabilizeSlider->onSliderEvent(this, &GuiApp::onStabilizeSliderEvent);
 	components.push_back(stabilizeSlider);
+	y += stabilizeSlider->getHeight() + p;
 
-	y += component->getHeight() + p;
 	component = new ofxDatGuiButton("RESET ZOOM");
 	component->setPosition(x, y);
 	component->onButtonEvent(this, &GuiApp::onResetButtonEvent);
 	components.push_back(component);
-	
 	y += component->getHeight() + p;
+
+	autoZoomSpeedSlider = new ofxDatGuiSlider("AUTO ZOOM SPEED", 0, 1, 0);
+	autoZoomSpeedSlider->setPosition(x, y);
+	autoZoomSpeedSlider->onSliderEvent(this, &GuiApp::onAutoZoomSpeedSliderEvent);
+	components.push_back(autoZoomSpeedSlider);
+	y += autoZoomSpeedSlider->getHeight() + p;
+
+	autoZoomInToggle = new ofxDatGuiToggle("AUTO ZOOM IN", false);
+	autoZoomInToggle->setPosition(x, y);
+	autoZoomInToggle->onToggleEvent(this, &GuiApp::onAutoZoomInToggleEvent);
+	components.push_back(autoZoomInToggle);
+	y += autoZoomInToggle->getHeight() + p;
+
+	autoZoomOutToggle = new ofxDatGuiToggle("AUTO ZOOM OUT", false);
+	autoZoomOutToggle->setPosition(x, y);
+	autoZoomOutToggle->onToggleEvent(this, &GuiApp::onAutoZoomOutToggleEvent);
+	components.push_back(autoZoomOutToggle);
+	y += autoZoomOutToggle->getHeight() + p;
+
+	component = new ofxDatGuiToggle("SHOW BOUNDS", false);
+	component->setPosition(x, y);
+	component->onToggleEvent(this, &GuiApp::onShowBoundsToggleEvent);
+	components.push_back(component);
+	y += component->getHeight() + p;
+
 	component = new ofxDatGuiButton("CROP TO BOUNDS");
 	component->setPosition(x, y);
 	component->onButtonEvent(this, &GuiApp::onCropToBoundsButtonEvent);
 	components.push_back(component);
-
-	
-	components.push_back(component);
+	y += component->getHeight() + p;
 
 	ofBackground(0);
 	ofSetVerticalSync(false);
@@ -56,6 +79,9 @@ void GuiApp::setup(){
 	zoom1Max = 0.0;
 	stabilize = 0.0;
 	lastCenterSize.set(1920, 1080, 3840, 2160);
+	autoZoomCenterSize.set(1920, 1080, 3840, 2160); 
+	autoZoomIn = false;
+	autoZoomOut = false;
 	
 }
 
@@ -64,11 +90,17 @@ void GuiApp::update(){
 //	cropToBounds();
 
 	if (rtPose->timeLatestPose) {
-		string s("GPGPU is DETECTING ");
-		s += ofToString(rtPose->currentNBody);
-		s += " HUMAN";
-		status->setText(s);
+		if(rtPose->detectionOn){
+			string s("GPGPU is DETECTING ");
+			s += ofToString(rtPose->currentNBody);
+			s += " HUMAN";
+			status->setText(s);
+		}
+		else {
+			status->setText("GPGPU DETECTION IS PAUSED");
+		}
 	}
+
 	if (zoom1Max > 0.0) {
 		ofVec4f centerSize = calcCrop();
 		centerSize.z = ofMap(zoom1Max, 0.0, 1.0, centerSize.z, 3840.0); // width
@@ -80,13 +112,50 @@ void GuiApp::update(){
 		ofVec2f newCenter(keep.x, keep.y);
 		ofVec2f lastCenter(lastCenterSize.x, lastCenterSize.y);
 		if (newCenter.distance(lastCenter) > stabilize) {
-			cropWidth = keep.z;
-			cropUpperLeftX = keep.x - keep.z / 2.0;
-			cropUpperLeftY = keep.y - keep.w / 2.0;
-			lastCenterSize = keep;
+			updateCrop(keep);
+		}
+
+		cout << " newx and lastx: " << newCenter.x << " - " << lastCenterSize.x
+			<< endl;
+		cout << " newx and lasty: " << newCenter.y << " - " << lastCenterSize.y
+			<< endl;
+
+		cout << "distance from last to new: " << newCenter.distance(lastCenter)
+			<< " stabilize: " << stabilize << endl;
+	}
+
+	if (autoZoomIn) {
+		ofVec4f newCenterSize(
+			autoZoomCenterSize.x,
+			autoZoomCenterSize.y,
+			lastCenterSize.z *  (1.0 - autoZoomSpeed / 1000.0),
+			lastCenterSize.w *  (1.0 - autoZoomSpeed / 1000.0)
+		);
+		if (newCenterSize.z > autoZoomCenterSize.z) {
+			ofVec4f keep = keepViewPort(newCenterSize);
+			updateCrop(keep);
 		}
 		
+	}else if (autoZoomOut) {
+		ofVec4f newCenterSize(
+			autoZoomCenterSize.x,
+			autoZoomCenterSize.y,
+			lastCenterSize.z *  (1.0 + autoZoomSpeed / 1000.0),
+			lastCenterSize.w *  (1.0 + autoZoomSpeed / 1000.0)
+		);
+		if (newCenterSize.z < autoZoomCenterSize.z) {
+			ofVec4f keep = keepViewPort(newCenterSize);
+			updateCrop(keep);
+		}
 	}
+
+	lastCenterSize.w = 2160 * (cropWidth / 3840);
+	lastCenterSize.z = cropWidth;
+	lastCenterSize.x = cropUpperLeftX + lastCenterSize.z / 2.0;
+	lastCenterSize.y = cropUpperLeftY + lastCenterSize.w / 2.0;
+
+
+	
 }
 
 
@@ -104,8 +173,20 @@ void GuiApp::keyPressed(int key) {
 
 }
 
+
+
+void GuiApp::updateCrop(ofVec4f centerSize) {
+
+	cropWidth = centerSize.z;
+	cropUpperLeftX = centerSize.x - centerSize.z / 2.0;
+	cropUpperLeftY = centerSize.y - centerSize.w / 2.0;
+	lastCenterSize = centerSize;
+}
+
+
 ofVec4f GuiApp::calcCrop() {
-	ofVec4f centerSize(1920, 1080, 3480,2160); // centerX, centerY, width, height;
+	//ofVec4f centerSize(1920, 1080, 3480,2160); // centerX, centerY, width, height;
+	ofVec4f centerSize = lastCenterSize;
 	if (rtPose->currentNBody > 0) {
 		// here, 1280x720;
 		ofVec2f center = (rtPose->sceneUpperLeft + rtPose->sceneLowerRight) / 2.0;
@@ -193,6 +274,16 @@ void GuiApp::onResetButtonEvent(ofxDatGuiButtonEvent e)
 	cropWidth = 3840;
 	cropUpperLeftX = 0.0;
 	cropUpperLeftY = 0.0;
+	zoomSlider->setValue(0.0);
+	lastCenterSize.set(1920, 1080, 3840, 2160);
+	autoZoomCenterSize.set(1920, 1080, 3840, 2160);
+	if (autoZoomIn || autoZoomOut) {
+		rtPose->detectionOn = true;
+	}
+	autoZoomIn = false;
+	autoZoomOut = false;
+	autoZoomInToggle->setChecked(false);
+	autoZoomOutToggle->setChecked(false);
 	cout << "onButtonEvent: " << e.target->getLabel() << endl;
 
 }
@@ -207,7 +298,6 @@ void GuiApp::onZoomSliderEvent(ofxDatGuiSliderEvent e)
 	float zoom = (float)e.value;
 	zoom1Max = (100 - zoom) / 100;
 
-	
 	cout << "onSliderEvent: " << e.value << "::" << e.scale << endl;
 }
 
@@ -216,6 +306,50 @@ void GuiApp::onStabilizeSliderEvent(ofxDatGuiSliderEvent e)
 	stabilize = (float)e.value;
 	//zoom1Max = (100 - zoom) / 100;
 	cout << "onSliderEvent: " << e.value << "::" << e.scale << endl;
+}
+
+void GuiApp::onAutoZoomSpeedSliderEvent(ofxDatGuiSliderEvent e)
+{
+	autoZoomSpeed = (float)e.value;
+	cout << "onSliderEvent: " << e.value << "::" << e.scale << endl;
+}
+
+void GuiApp::onAutoZoomInToggleEvent(ofxDatGuiToggleEvent e)
+{
+	if (!autoZoomIn) {
+		autoZoomCenterSize = calcCrop();
+		rtPose->detectionOn = false;
+		autoZoomOut = false;
+		autoZoomOutToggle->setChecked(false);
+	}
+	else {
+		rtPose->detectionOn = true;
+	}
+	autoZoomIn = e.target->getChecked();
+	
+	cout << "onToggleEvent: " << e.target->getLabel() << "::" << e.target->getChecked() << endl;
+}
+
+void GuiApp::onAutoZoomOutToggleEvent(ofxDatGuiToggleEvent e)
+{
+	if (!autoZoomOut) {
+		autoZoomCenterSize = ofVec4f(1920, 1080, 3480, 2160);
+		rtPose->detectionOn = false;
+		autoZoomIn = false;
+		autoZoomInToggle->setChecked(false);
+	}
+	else {
+		rtPose->detectionOn = true;
+	}
+	autoZoomOut = e.target->getChecked();
+
+	cout << "onToggleEvent: " << e.target->getLabel() << "::" << e.target->getChecked() << endl;
+}
+
+void GuiApp::onShowBoundsToggleEvent(ofxDatGuiToggleEvent e)
+{
+	drawBounds = e.target->getChecked();
+	cout << "onToggleEvent: " << e.target->getLabel() << "::" << e.target->getChecked() << endl;
 }
 
 void GuiApp::onToggleEvent(ofxDatGuiToggleEvent e)

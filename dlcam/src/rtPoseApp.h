@@ -57,6 +57,8 @@ public:
 	vector<dlBody> currentBodies;
 	int currentNBody;
 
+	bool detectionOn;
+
 	ofVec2f sceneUpperLeft, sceneLowerRight;
 };
 
