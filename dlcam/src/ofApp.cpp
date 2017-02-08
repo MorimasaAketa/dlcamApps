@@ -19,7 +19,7 @@ void ofApp::setup() {
 	ofBackground(0);
 
 	tex2160.allocate(3840, 2160, GL_RGBA);
-	control->tex2160 = tex2160;
+	rtPose->tex2160 = tex2160;
 
 
 	fbo2160.allocate(3840, 2160, GL_RGBA);
@@ -27,10 +27,9 @@ void ofApp::setup() {
 	ofClear(0, 0, 255, 255);
 	fbo2160.end();
 
-	control->mainFbo = fbo2160;
+	rtPose->mainFbo = fbo2160;
 	cropCenter.set(1920, 1080);
 	cropSize.set(3840, 2160);
-	drawBounds = false;
 }
 
 //--------------------------------------------------------------
@@ -44,7 +43,7 @@ void ofApp::update() {
 
 	for (auto input : this->inputs) {
 		if (input->isFrameNew()) {
-			control->isFrameNew = true;
+			rtPose->isFrameNew = true;
 			tex2160.clear();
 			tex2160 = input->getTexture(); // faster?
 			fbo2160.begin();
@@ -62,45 +61,84 @@ void ofApp::draw() {
 	float x = 0; float y = 0;
 
 	//	float width = 1920 / 2; float height = 1080 / 2;
-	float width = 3840; float height = 2160;
+	float width = 3840.0; float height = 2160.0;
 
 	for (auto input : this->inputs) {
-		//fbo2160.draw(0, 0, 1920,1080);
+		
+		ofVec3f cropUpperLeft(gui->cropUpperLeftX, gui->cropUpperLeftY, 0 );
+		float scale = 3840.0 / gui->cropWidth;
+		cropUpperLeft = cropUpperLeft / 2 * - 1.0;
+		cout << " translation: " << cropUpperLeft.x << ", " << cropUpperLeft.y 
+			<< " cropWidth: " << gui->cropWidth
+			<< " scale: " << scale
+			<< endl;
+		ofPushMatrix();
+			ofScale(ofPoint(scale, scale, 1.0));
+			ofTranslate(cropUpperLeft);
+			fbo2160.draw(0, 0, 1920, 1080);
 
-		//fbo2160.draw(upperLeft.x * zoomRatio, upperLeft.y * zoomRatio,
-		//	3840 * zoomRatio, 2160 * zoomRatio);
-		//fbo2160.draw(-1920 / 2, -1080 / 2, 3840, 2160);
-		//fbo2160.draw(upperLeft.x * zoomRatio, upperLeft.y * zoomRatio,
-		//	3840 * zoomRatio, 2160 * zoomRatio);
+
+		///////////////////
+		if (gui->drawBounds && rtPose->currentNBody) {
+			ofPushMatrix();
+			ofSetColor(ofColor::red);
+			ofNoFill();
+			ofSetLineWidth(2);
+			ofScale(1920.0 / 3840.0, 1080.0 / 2160.0, 1.0);
+			ofDrawRectangle(gui->cropUpperLeftX, gui->cropUpperLeftY,
+				gui->cropWidth, 2160.0 * gui->cropWidth / 3840.0);
+			ofSetColor(255);
+			ofPopMatrix();
+
+			ofPushMatrix();
+			ofSetColor(ofColor::yellow);
+			ofNoFill();
+			ofSetLineWidth(3);
+			ofScale(1920.0 / 1280.0, 1080.0 / 720.0, 1.0);
+			ofDrawRectangle(rtPose->sceneUpperLeft.x, rtPose->sceneUpperLeft.y,
+				rtPose->sceneLowerRight.x - rtPose->sceneUpperLeft.x,
+				rtPose->sceneLowerRight.y - rtPose->sceneUpperLeft.y);
+			ofSetColor(255);
+			ofPopMatrix();
+		}
+		/////////////////
+		ofPopMatrix();
+
+			//fbo2160.draw(0, 0, 1920,1080);
+
+			//fbo2160.draw(upperLeft.x * zoomRatio, upperLeft.y * zoomRatio,
+			//	3840 * zoomRatio, 2160 * zoomRatio);
+			//fbo2160.draw(-1920 / 2, -1080 / 2, 3840, 2160);
+			//fbo2160.draw(upperLeft.x * zoomRatio, upperLeft.y * zoomRatio,
+			//	3840 * zoomRatio, 2160 * zoomRatio);
 
 
-		ofVec2f cropUpperLeft  = cropCenter - cropSize/2;
-		ofVec2f upperLeft = - cropUpperLeft; // 4K geometory;
-		float offsetx = upperLeft.x / (3840 / cropSize.x);
-		float offsety = upperLeft.y / (2160 / cropSize.y);
-		fbo2160.draw(
-			offsetx, offsety,
-			1920 * (3840 / cropSize.x), 
-			1080 * (2160 / cropSize.y)
-		);
+			/*ofVec2f cropUpperLeft  = cropCenter - cropSize/2;
+			ofVec2f upperLeft = - cropUpperLeft; // 4K geometory;
+			float offsetx = upperLeft.x / (3840 / cropSize.x);
+			float offsety = upperLeft.y / (2160 / cropSize.y);
+		
+			fbo2160.draw(
+				offsetx, offsety,
+				1920 * (3840 / cropSize.x),
+				1080 * (2160 / cropSize.y)
+			);
+			
+			*/
+			/*
+		ofPixels pix2160, pix1080;
+		fbo2160.readToPixels(pix2160);
+		pix2160.crop(gui->cropUpperLeftX, gui->cropUpperLeftY, gui->cropWidth, 2160 * (gui->cropWidth / 3840));
+		ofImage img1080;
+		img1080.setFromPixels(pix2160);
+		img1080.draw(0, 0, 1920, 1080);
+		*/
 		//ofLogNotice() << offsetx;
 	}
 	if (this->inputs.empty()) {
 		ofDrawBitmapString("No BlackMagic input devices found", 20, 20);
 	}
-
-	if (drawBounds && control->currentNBody) {
-		ofPushMatrix();
-		ofSetColor(ofColor::yellow);
-		ofNoFill();
-		ofSetLineWidth(3);
-		ofScale(1920.0 / 1280.0, 1080.0 / 720.0, 1.0);
-		ofDrawRectangle(control->sceneUpperLeft.x, control->sceneUpperLeft.y,
-			control->sceneLowerRight.x - control->sceneUpperLeft.x,
-			control->sceneLowerRight.y - control->sceneUpperLeft.y);
-		ofSetColor(255);
-		ofPopMatrix();
-	}
+	
 
 
 }
@@ -109,7 +147,7 @@ bool ofApp::checkCropConstraint(ofVec2f center, ofVec2f size) {
 	ofVec2f cropUpperLeft = center - size / 2;
 	ofVec2f cropLowerRight = center + size / 2;
 	bool check = true;
-	ofLog() << size.x;
+	// ofLog() << size.x;
 	if (cropUpperLeft.x < 0 || cropUpperLeft.y < 0
 		|| cropLowerRight.x > 3840 || cropLowerRight.y > 2160
 		|| size.x > 3840 || size.y > 2160 
@@ -149,9 +187,6 @@ void ofApp::keyPressed(int key) {
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-	if (key == 'b') {
-		drawBounds = !drawBounds;
-	}
 
 }
 

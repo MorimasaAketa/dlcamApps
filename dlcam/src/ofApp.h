@@ -1,8 +1,8 @@
 #pragma once
 #include "ofxBlackmagic.h"
 #include "ofMain.h"
-#include "controlApp.h"
-
+#include "rtPoseApp.h"
+#include "GuiApp.h"
 
 class ofApp : public ofBaseApp{
 
@@ -40,13 +40,9 @@ class ofApp : public ofBaseApp{
 		// crop size < 3830, 2160
 		// crop size > 1920, 1080
 
-		vector<vector<ofVec3f>> currentBodies;
-	
-
 		ofVec2f positionMousePressed;
 	
+		shared_ptr<rtPoseApp> rtPose;
+		shared_ptr<GuiApp> gui;
 
-		shared_ptr<controlApp> control;
-
-		bool drawBounds;
 };
