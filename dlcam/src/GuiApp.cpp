@@ -21,7 +21,7 @@ void GuiApp::setup(){
 	components.push_back(status);
 	y += status->getHeight() + p;
 	
-	zoomSlider = new ofxDatGuiSlider("ZOOM", 0, 100, 0);
+	zoomSlider = new ofxDatGuiSlider("ZOOM", 0, 99.99, 0);
 	zoomSlider->setPosition(x, y);
 	zoomSlider->onSliderEvent(this, &GuiApp::onZoomSliderEvent);
 	components.push_back(zoomSlider);
@@ -100,7 +100,7 @@ void GuiApp::update(){
 			status->setText("GPGPU DETECTION IS PAUSED");
 		}
 	}
-
+//////////////////////////////////////////////////////////
 	if (zoom1Max > 0.0) {
 		ofVec4f centerSize = calcCrop();
 		centerSize.z = ofMap(zoom1Max, 0.0, 1.0, centerSize.z, 3840.0); // width
@@ -297,7 +297,7 @@ void GuiApp::onCropToBoundsButtonEvent(ofxDatGuiButtonEvent e)
 void GuiApp::onZoomSliderEvent(ofxDatGuiSliderEvent e)
 {
 	float zoom = (float)e.value;
-	zoom1Max = (100 - zoom) / 100;
+	zoom1Max = (100.0 - zoom) / 100.0;
 
 	cout << "onSliderEvent: " << e.value << "::" << e.scale << endl;
 }
