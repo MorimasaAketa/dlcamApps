@@ -12,15 +12,16 @@ public:
 	void draw();
 	void keyPressed(int key);
 	void cropToBounds();
-	ofVec3f calcCrop();
-	
+	ofVec4f calcCrop();
+	ofVec4f keepViewPort(ofVec4f centerSize);
+
 	vector<ofxDatGuiComponent*> components;
 	ofxDatGuiTextInput* status;
 
 	void onResetButtonEvent(ofxDatGuiButtonEvent e);
 	void onCropToBoundsButtonEvent(ofxDatGuiButtonEvent e);
 
-	void onCropWidthEvent(ofxDatGuiSliderEvent e);
+	void onZoomEvent(ofxDatGuiSliderEvent e);
 	void onToggleEvent(ofxDatGuiToggleEvent e);
 	void onSliderEvent(ofxDatGuiSliderEvent e);
 	void onDropdownEvent(ofxDatGuiDropdownEvent e);
@@ -29,16 +30,8 @@ public:
 	void on2dPadEvent(ofxDatGui2dPadEvent e);
 	void onTextInputEvent(ofxDatGuiTextInputEvent e);
 
+	float cropWidth, cropUpperLeftX, cropUpperLeftY, zoom1Max;
 
-
-	ofParameterGroup parameters;
-	ofParameter<float> guiCropWidth;
-	ofParameter<float> guiCropUpperLeftX;
-	ofParameter<float> guiCropUpperLeftY;
-	ofParameter<ofColor> color;
-	ofxPanel gui;
-
-	float cropWidth, cropUpperLeftX, cropUpperLeftY;
 
 	shared_ptr<rtPoseApp> rtPose;
 	bool drawBounds;

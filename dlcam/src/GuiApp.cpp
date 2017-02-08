@@ -32,37 +32,26 @@ void GuiApp::setup(){
 	components.push_back(component);
 
 	y += component->getHeight() + p;
-	component = new ofxDatGuiSlider("cropWidth", 1920, 3840, 3840);
+	component = new ofxDatGuiSlider("ZOOM", 0, 100, 0);
 	component->setPosition(x, y);
-	component->onSliderEvent(this, &GuiApp::onCropWidthEvent);
+	component->onSliderEvent(this, &GuiApp::onZoomEvent);
 	components.push_back(component);
 
-	parameters.setName("parameters");
-	parameters.add(guiCropWidth.set("cropWidth",3840,1920,3840));
-	parameters.add(guiCropUpperLeftX.set("cropUpperLeftX", 0, 0, 960));
-	parameters.add(guiCropUpperLeftY.set("cropUpperLeftY", 0, 0, 540));
-	gui.setup(parameters);
+
 	ofBackground(0);
 	ofSetVerticalSync(false);
 	drawBounds = false;
-	cropSliderValid = true;
 
 	cropWidth = 3840;
 	cropUpperLeftX = 0;
 	cropUpperLeftY = 0;
+	zoom1Max = 0.0;
 	
 }
 
 void GuiApp::update(){
 	for (int i = 0; i<components.size(); i++) components[i]->update();
-	cropToBounds();
-	//cout << "cropWidth: " << cropWidth << endl;
-/*	if (cropSliderValid) {
-		cropWidth = guiCropWidth.get();
-		cropUpperLeftX = guiCropUpperLeftX.get();
-		cropUpperLeftY = guiCropUpperLeftY.get();
-	}
-*/
+//	cropToBounds();
 
 	if (rtPose->timeLatestPose) {
 		string s("GPGPU is DETECTING ");
@@ -70,12 +59,21 @@ void GuiApp::update(){
 		s += " HUMAN";
 		status->setText(s);
 	}
+	if (zoom1Max > 0.0) {
+		ofVec4f centerSize = calcCrop();
+		centerSize.z = ofMap(zoom1Max, 0.0, 1.0, centerSize.z, 3840.0); // width
+		centerSize.w = 2160 * centerSize.z / 3840; // height;
+
+		ofVec4f keep = keepViewPort(centerSize);
+		cropWidth = keep.z;
+		cropUpperLeftX = keep.x - keep.z / 2.0;
+		cropUpperLeftY = keep.y - keep.w / 2.0;
+	}
 }
 
 
 
 void GuiApp::draw(){
-	//gui.draw();
 	for (int i = 0; i<components.size(); i++) components[i]->draw();
 
 }
@@ -88,8 +86,8 @@ void GuiApp::keyPressed(int key) {
 
 }
 
-ofVec3f GuiApp::calcCrop() {
-	ofVec3f crop(0,0,3480); // left, top, width
+ofVec4f GuiApp::calcCrop() {
+	ofVec4f centerSize(1920, 1080, 3480,2160); // centerX, centerY, width, height;
 	if (rtPose->currentNBody > 0) {
 		// here, 1280x720;
 		ofVec2f center = (rtPose->sceneUpperLeft + rtPose->sceneLowerRight) / 2.0;
@@ -127,18 +125,43 @@ ofVec3f GuiApp::calcCrop() {
 		else if (bottom > 2160.0) {
 			center.y -= bottom - 2160.0;
 		}
-
-		crop.set(center.x - (size.x / 2.0), center.y - (size.y / 2.0), size.x);
+		centerSize.set(center.x, center.y, size.x, size.y);
+//		crop.set(center.x - (size.x / 2.0), center.y - (size.y / 2.0), size.x);
 		
 	}
-	return crop;
+	return centerSize;
 }
 
+ofVec4f GuiApp::keepViewPort(ofVec4f centerSize) {
+	float left = centerSize.x - centerSize.z / 2.0;
+	float top = centerSize.y - centerSize.w / 2.0;
+	float right = centerSize.x + centerSize.z / 2.0;
+	float bottom = centerSize.y + centerSize.w / 2.0;
+
+	if (left < 0.0) {
+		centerSize.x += left * -1.0;
+	}
+	else if (right > 3840.0) {
+		centerSize.x -= right - 3840.0;
+	}
+
+	if (top < 0.0) {
+		centerSize.y += top * -1.0;
+	}
+	else if (bottom > 2160.0) {
+		centerSize.y -= bottom - 2160.0;
+	}
+
+	ofVec4f newCenterSize(centerSize.x, centerSize.y, centerSize.z, centerSize.w);
+
+	return newCenterSize;
+
+}
 void GuiApp::cropToBounds() {
-	ofVec3f crop = calcCrop();
-	cropWidth = crop.z;
-	cropUpperLeftX = crop.x;
-	cropUpperLeftY = crop.y;
+	ofVec4f centerSize = calcCrop();
+	cropWidth = centerSize.z;
+	cropUpperLeftX = centerSize.x - centerSize.z / 2.0;
+	cropUpperLeftY = centerSize.y - centerSize.w / 2.0;
 }
 
 
@@ -160,10 +183,12 @@ void GuiApp::onCropToBoundsButtonEvent(ofxDatGuiButtonEvent e)
 	cropToBounds();
 }
 
-void GuiApp::onCropWidthEvent(ofxDatGuiSliderEvent e)
+void GuiApp::onZoomEvent(ofxDatGuiSliderEvent e)
 {
-	cropWidth = (float)e.value;
+	float zoom = (float)e.value;
+	zoom1Max = (100 - zoom) / 100;
 
+	
 	cout << "onSliderEvent: " << e.value << "::" << e.scale << endl;
 }
 
