@@ -115,19 +115,16 @@ void GuiApp::update(){
 			updateCrop(keep);
 		}
 
-		cout << " newx and lastx: " << newCenter.x << " - " << lastCenterSize.x
-			<< endl;
-		cout << " newx and lasty: " << newCenter.y << " - " << lastCenterSize.y
-			<< endl;
-
-		cout << "distance from last to new: " << newCenter.distance(lastCenter)
-			<< " stabilize: " << stabilize << endl;
 	}
 
 	if (autoZoomIn) {
+		ofVec2f lastCenter(lastCenterSize.x, lastCenterSize.y);
+		ofVec2f targetCenter(autoZoomCenterSize.x, autoZoomCenterSize.y);
+		ofVec2f difference = targetCenter - lastCenter;
+
 		ofVec4f newCenterSize(
-			autoZoomCenterSize.x,
-			autoZoomCenterSize.y,
+			lastCenter.x + difference.x * autoZoomSpeed / 1000.0,
+			lastCenter.y + difference.y * autoZoomSpeed / 1000.0,
 			lastCenterSize.z *  (1.0 - autoZoomSpeed / 1000.0),
 			lastCenterSize.w *  (1.0 - autoZoomSpeed / 1000.0)
 		);
@@ -137,9 +134,13 @@ void GuiApp::update(){
 		}
 		
 	}else if (autoZoomOut) {
+		ofVec2f lastCenter(lastCenterSize.x, lastCenterSize.y);
+		ofVec2f targetCenter(autoZoomCenterSize.x, autoZoomCenterSize.y);
+		ofVec2f difference = targetCenter - lastCenter;
+
 		ofVec4f newCenterSize(
-			autoZoomCenterSize.x,
-			autoZoomCenterSize.y,
+			lastCenter.x + difference.x * autoZoomSpeed / 1000.0,
+			lastCenter.y + difference.y * autoZoomSpeed / 1000.0,
 			lastCenterSize.z *  (1.0 + autoZoomSpeed / 1000.0),
 			lastCenterSize.w *  (1.0 + autoZoomSpeed / 1000.0)
 		);
