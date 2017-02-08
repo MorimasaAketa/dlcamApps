@@ -20,7 +20,19 @@ void GuiApp::setup(){
 	components.push_back(status);
 
 	y += status->getHeight() + p;
-	component = new ofxDatGuiButton("RESET");
+	component = new ofxDatGuiSlider("ZOOM", 0, 100, 0);
+	component->setPosition(x, y);
+	component->onSliderEvent(this, &GuiApp::onZoomSliderEvent);
+	components.push_back(component);
+
+	stabilizeSlider = new ofxDatGuiSlider("STABILIZE", 0, 100, 0);
+	y += stabilizeSlider->getHeight() + p;
+	stabilizeSlider->setPosition(x, y);
+	stabilizeSlider->onSliderEvent(this, &GuiApp::onStabilizeSliderEvent);
+	components.push_back(stabilizeSlider);
+
+	y += component->getHeight() + p;
+	component = new ofxDatGuiButton("RESET ZOOM");
 	component->setPosition(x, y);
 	component->onButtonEvent(this, &GuiApp::onResetButtonEvent);
 	components.push_back(component);
@@ -31,12 +43,8 @@ void GuiApp::setup(){
 	component->onButtonEvent(this, &GuiApp::onCropToBoundsButtonEvent);
 	components.push_back(component);
 
-	y += component->getHeight() + p;
-	component = new ofxDatGuiSlider("ZOOM", 0, 100, 0);
-	component->setPosition(x, y);
-	component->onSliderEvent(this, &GuiApp::onZoomEvent);
+	
 	components.push_back(component);
-
 
 	ofBackground(0);
 	ofSetVerticalSync(false);
@@ -46,6 +54,8 @@ void GuiApp::setup(){
 	cropUpperLeftX = 0;
 	cropUpperLeftY = 0;
 	zoom1Max = 0.0;
+	stabilize = 0.0;
+	lastCenterSize.set(1920, 1080, 3840, 2160);
 	
 }
 
@@ -65,9 +75,17 @@ void GuiApp::update(){
 		centerSize.w = 2160 * centerSize.z / 3840; // height;
 
 		ofVec4f keep = keepViewPort(centerSize);
-		cropWidth = keep.z;
-		cropUpperLeftX = keep.x - keep.z / 2.0;
-		cropUpperLeftY = keep.y - keep.w / 2.0;
+		
+		// stabilize
+		ofVec2f newCenter(keep.x, keep.y);
+		ofVec2f lastCenter(lastCenterSize.x, lastCenterSize.y);
+		if (newCenter.distance(lastCenter) > stabilize) {
+			cropWidth = keep.z;
+			cropUpperLeftX = keep.x - keep.z / 2.0;
+			cropUpperLeftY = keep.y - keep.w / 2.0;
+			lastCenterSize = keep;
+		}
+		
 	}
 }
 
@@ -171,6 +189,7 @@ event listeners
 
 void GuiApp::onResetButtonEvent(ofxDatGuiButtonEvent e)
 {
+	zoom1Max = 0.0;
 	cropWidth = 3840;
 	cropUpperLeftX = 0.0;
 	cropUpperLeftY = 0.0;
@@ -183,7 +202,7 @@ void GuiApp::onCropToBoundsButtonEvent(ofxDatGuiButtonEvent e)
 	cropToBounds();
 }
 
-void GuiApp::onZoomEvent(ofxDatGuiSliderEvent e)
+void GuiApp::onZoomSliderEvent(ofxDatGuiSliderEvent e)
 {
 	float zoom = (float)e.value;
 	zoom1Max = (100 - zoom) / 100;
@@ -192,6 +211,12 @@ void GuiApp::onZoomEvent(ofxDatGuiSliderEvent e)
 	cout << "onSliderEvent: " << e.value << "::" << e.scale << endl;
 }
 
+void GuiApp::onStabilizeSliderEvent(ofxDatGuiSliderEvent e)
+{
+	stabilize = (float)e.value;
+	//zoom1Max = (100 - zoom) / 100;
+	cout << "onSliderEvent: " << e.value << "::" << e.scale << endl;
+}
 
 void GuiApp::onToggleEvent(ofxDatGuiToggleEvent e)
 {

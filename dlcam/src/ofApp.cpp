@@ -68,10 +68,11 @@ void ofApp::draw() {
 		ofVec3f cropUpperLeft(gui->cropUpperLeftX, gui->cropUpperLeftY, 0 );
 		float scale = 3840.0 / gui->cropWidth;
 		cropUpperLeft = cropUpperLeft / 2 * - 1.0;
-		cout << " translation: " << cropUpperLeft.x << ", " << cropUpperLeft.y 
+	/*	cout << " translation: " << cropUpperLeft.x << ", " << cropUpperLeft.y 
 			<< " cropWidth: " << gui->cropWidth
 			<< " scale: " << scale
 			<< endl;
+			*/
 		ofPushMatrix();
 			ofScale(ofPoint(scale, scale, 1.0));
 			ofTranslate(cropUpperLeft);
