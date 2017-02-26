@@ -16,9 +16,9 @@ int main( ){
 	settings.resizable = false;
 	shared_ptr<ofAppBaseWindow> rtPoseWindow = ofCreateWindow(settings);
 
-	settings.width = 640;
+	settings.width = 1280;
 	settings.height = 720;
-	settings.setPosition(ofVec2f(10, 0));
+	settings.setPosition(ofVec2f(0, 0));
 	settings.resizable = true;
 	shared_ptr<ofAppBaseWindow> GuiWindow = ofCreateWindow(settings);
 
