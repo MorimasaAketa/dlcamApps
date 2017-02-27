@@ -102,13 +102,15 @@ void GuiApp::setup(){
 	component->onToggleEvent(this, &GuiApp::onShowBoundsToggleEvent);
 	components.push_back(component);
 	y += component->getHeight() + p;
-	/*
-	component = new ofxDatGuiButton("From Left");
+
+
+	component = new ofxDatGuiButton("FROM LEFT");
 	component->setPosition(x, y);
-	component->onToggleEvent(this, &GuiApp::onPanFromLeftButtonEvent);
+	component->onButtonEvent(this, &GuiApp::onPanFromLeftButtonEvent);
+//	component->onToggleEvent(this, &GuiApp::onPanFromLeftButtonEvent);
 	components.push_back(component);
 	y += component->getHeight() + p;
-	*/
+	
 
 	/*
 	component = new ofxDatGuiButton("CROP TO BOUNDS");
@@ -132,6 +134,7 @@ void GuiApp::setup(){
 	autoZoomOut = false;
 	shot = DLFullFigure;
 	pan = DLPanNot;
+	updateDetectionForPan = false;
 }
 
 void GuiApp::update(){
@@ -198,13 +201,33 @@ void GuiApp::update(){
 			updateCrop(keep);
 		}
 	}
+	else if (pan == DLPanFromLeft) {
+		ofVec2f lastCenter(lastCenterSize.x, lastCenterSize.y);
+		ofVec2f targetCenter(panFromCenterSize.x, panFromCenterSize.y);
+		ofVec2f difference = targetCenter - lastCenter;
+		ofVec4f newCenterSize(
+			lastCenter.x + difference.x * autoZoomSpeed / 400.0,
+			lastCenter.y + difference.y * autoZoomSpeed / 400.0,
+			lastCenterSize.z,
+			lastCenterSize.w
+		);
+		if (newCenterSize.x < panFromCenterSize.x) {
+			updateCrop(newCenterSize);
+		}else{
+			pan = DLPanNot;
+			rtPose->detectionOn = true;
+		}
+
+	}
 
 	lastCenterSize.w = 2160 * (cropWidth / 3840);
 	lastCenterSize.z = cropWidth;
 	lastCenterSize.x = cropUpperLeftX + lastCenterSize.z / 2.0;
 	lastCenterSize.y = cropUpperLeftY + lastCenterSize.w / 2.0;
 
-
+	if (updateDetectionForPan) {
+		calcPanStart();
+	}
 	
 }
 
@@ -333,6 +356,13 @@ void GuiApp::cropToBounds() {
 	cropUpperLeftY = centerSize.y - centerSize.w / 2.0;
 }
 
+void GuiApp::calcPanStart() {
+	panFromCenterSize = calcCrop();
+	lastCenterSize.set(panFromCenterSize.z / 2.0, panFromCenterSize.y,
+		panFromCenterSize.z, panFromCenterSize.w);
+	rtPose->detectionOn = false;
+	updateDetectionForPan = false;
+}
 
 /*
 event listeners
@@ -347,7 +377,8 @@ void GuiApp::onResetButtonEvent(ofxDatGuiButtonEvent e)
 	zoomSlider->setValue(0.0);
 	lastCenterSize.set(1920, 1080, 3840, 2160);
 	autoZoomCenterSize.set(1920, 1080, 3840, 2160);
-	if (autoZoomIn || autoZoomOut || pan !=DLPanNot) {
+	if (autoZoomIn || autoZoomOut || pan != DLPanNot) {
+//	if (autoZoomIn || autoZoomOut ) {
 		rtPose->detectionOn = true;
 	}
 	autoZoomIn = false;
@@ -434,48 +465,37 @@ void GuiApp::onZoomToFullFigureToggleEvent(ofxDatGuiToggleEvent e)
 
 void GuiApp::onZoomToKneeShotToggleEvent(ofxDatGuiToggleEvent e)
 {
-	// turn on this toggle
-	if (shot != DLKneeShot){
 		zoomToFullFigure->setChecked(false);
 		zoomToWeistShot->setChecked(false);
 		zoomToBustShot->setChecked(false);
+		zoomToKneeShot->setChecked(true);
 		shot = DLKneeShot;
-	}
-	else { // turn off this toggle; turn on full figure
-		zoomToFullFigure->setChecked(true);
-		shot = DLFullFigure;
-	}
+
 }
 
 void GuiApp::onZoomToWeistShotToggleEvent(ofxDatGuiToggleEvent e)
 {
-	// turn on this toggle
-	if (shot != DLWeistShot) {
+	
 		zoomToFullFigure->setChecked(false);
+		zoomToWeistShot->setChecked(true);
+
 		zoomToKneeShot->setChecked(false);
 		zoomToBustShot->setChecked(false);
 		shot = DLWeistShot;
-	}
-	else { // turn off this toggle; turn on full figure
-		zoomToFullFigure->setChecked(true);
-		shot = DLFullFigure;
-	}
+
 }
 
 
 void GuiApp::onZoomToBustShotToggleEvent(ofxDatGuiToggleEvent e)
 {
-	// turn on this toggle
-	if (shot != DLBustShot) {
+
 		zoomToFullFigure->setChecked(false);
 		zoomToKneeShot->setChecked(false);
 		zoomToWeistShot->setChecked(false);
+		zoomToBustShot->setChecked(true);
+
 		shot = DLBustShot;
-	}
-	else { // turn off this toggle; turn on full figure
-		zoomToFullFigure->setChecked(true);
-		shot = DLFullFigure;
-	}
+
 }
 
 void GuiApp::onShowBoundsToggleEvent(ofxDatGuiToggleEvent e)
@@ -483,29 +503,28 @@ void GuiApp::onShowBoundsToggleEvent(ofxDatGuiToggleEvent e)
 	drawBounds = e.target->getChecked();
 	cout << "onToggleEvent: " << e.target->getLabel() << "::" << e.target->getChecked() << endl;
 }
-/*
+
 void GuiApp::onPanFromLeftButtonEvent(ofxDatGuiButtonEvent e)
 {
-	pan = DLPanFromLeft;
-	zoom1Max = 0.0;
-	cropWidth = 3840;
-	cropUpperLeftX = 0.0;
-	cropUpperLeftY = 0.0;
-	zoomSlider->setValue(0.0);
-	lastCenterSize.set(1920, 1080, 3840, 2160);
-	autoZoomCenterSize.set(1920, 1080, 3840, 2160);
-	if (autoZoomIn || autoZoomOut || pan != DLPanNot) {
-		rtPose->detectionOn = true;
-	}
-	autoZoomIn = false;
-	autoZoomOut = false;
-	pan = DLPanNot;
-	autoZoomInToggle->setChecked(false);
-	autoZoomOutToggle->setChecked(false);
 	cout << "onButtonEvent: " << e.target->getLabel() << endl;
 
+	autoZoomIn = false;
+	autoZoomOut = false;
+	autoZoomInToggle->setChecked(false);
+	autoZoomOutToggle->setChecked(false);
+	pan = DLPanFromLeft;
+	updateDetectionForPan = false;
+
+	if (!rtPose->detectionOn) {
+		updateDetectionForPan = true;
+		rtPose->detectionOn = true;
+		return;
+	}
+	else {
+		calcPanStart();
+	}
 }
-*/
+
 
 void GuiApp::onToggleEvent(ofxDatGuiToggleEvent e)
 {
