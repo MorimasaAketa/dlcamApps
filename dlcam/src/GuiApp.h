@@ -6,7 +6,7 @@
 #include "rtPoseApp.h"
 
 enum DLShot { DLFullFigure, DLKneeShot, DLWeistShot, DLBustShot};
-enum DLPanFrom {DLPanNot, DLPanFromLeft, DLPanFromRight};
+enum DLPanFrom {DLPanNot, DLPanFromLeft, DLPanFromRight, DLPanFromTop, DLPanFromBottom};
 
 class GuiApp: public ofBaseApp {
 public:
@@ -45,7 +45,7 @@ public:
 	void onZoomToKneeShotToggleEvent(ofxDatGuiToggleEvent e);
 	void onZoomToWeistShotToggleEvent(ofxDatGuiToggleEvent e);
 	void onZoomToBustShotToggleEvent(ofxDatGuiToggleEvent e);
-	void onPanFromLeftButtonEvent(ofxDatGuiButtonEvent e);
+	void onPanFromButtonEvent(ofxDatGuiButtonEvent e);
 	//void onPanFromRightButtonEvent(ofxDatGuiButtonEvent e);
 
 

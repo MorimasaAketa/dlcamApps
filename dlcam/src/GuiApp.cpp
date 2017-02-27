@@ -63,21 +63,21 @@ void GuiApp::setup(){
 	components.push_back(autoZoomOutToggle);
 	y += autoZoomOutToggle->getHeight() + p;
 
-	colWidth = width / 4 - 20;
+	colWidth = width / 4;
 
 	zoomToFullFigure = new ofxDatGuiToggle("Full", true);
 	zoomToFullFigure->setPosition(x, y);
 	zoomToFullFigure->setWidth(colWidth);
 	zoomToFullFigure->onToggleEvent(this, &GuiApp::onZoomToFullFigureToggleEvent);
 	components.push_back(zoomToFullFigure);
-	x += (colWidth + 10);
+	x += colWidth;
 
 	zoomToKneeShot = new ofxDatGuiToggle("Knee", false);
 	zoomToKneeShot->setPosition(x, y);
 	zoomToKneeShot->setWidth(colWidth);
 	zoomToKneeShot->onToggleEvent(this, &GuiApp::onZoomToKneeShotToggleEvent);
 	components.push_back(zoomToKneeShot);
-	x += (colWidth + 10);
+	x += colWidth;
 
 
 	zoomToWeistShot = new ofxDatGuiToggle("Weist", false);
@@ -85,14 +85,14 @@ void GuiApp::setup(){
 	zoomToWeistShot->setWidth(colWidth);
 	zoomToWeistShot->onToggleEvent(this, &GuiApp::onZoomToWeistShotToggleEvent);
 	components.push_back(zoomToWeistShot);
-	x += (colWidth + 10);
+	x += colWidth;
 
 	zoomToBustShot = new ofxDatGuiToggle("Bust", false);
 	zoomToBustShot->setPosition(x, y);
 	zoomToBustShot->setWidth(colWidth);
 	zoomToBustShot->onToggleEvent(this, &GuiApp::onZoomToBustShotToggleEvent);
 	components.push_back(zoomToBustShot);
-	x += (colWidth + 5);
+	x += colWidth;
 
 	x = 640;
 	y = 0 + 50;
@@ -103,12 +103,38 @@ void GuiApp::setup(){
 	components.push_back(component);
 	y += component->getHeight() + p;
 
-
+	colWidth = width / 4;
 	component = new ofxDatGuiButton("FROM LEFT");
 	component->setPosition(x, y);
-	component->onButtonEvent(this, &GuiApp::onPanFromLeftButtonEvent);
+	component->setWidth(colWidth, 0.5);
+	component->onButtonEvent(this, &GuiApp::onPanFromButtonEvent);
+	//	component->onToggleEvent(this, &GuiApp::onPanFromLeftButtonEvent);
+	components.push_back(component);
+	x += (colWidth);
+
+	component = new ofxDatGuiButton("RIGHT");
+	component->setPosition(x, y);
+	component->setWidth(colWidth,10);
+	component->onButtonEvent(this, &GuiApp::onPanFromButtonEvent);
 //	component->onToggleEvent(this, &GuiApp::onPanFromLeftButtonEvent);
 	components.push_back(component);
+	x += (colWidth);
+
+	component = new ofxDatGuiButton("TOP");
+	component->setPosition(x, y);
+	component->setWidth(colWidth,10);
+	component->onButtonEvent(this, &GuiApp::onPanFromButtonEvent);
+	//	component->onToggleEvent(this, &GuiApp::onPanFromLeftButtonEvent);
+	components.push_back(component);
+	x += (colWidth);
+	component = new ofxDatGuiButton("BOTTOM");
+	component->setPosition(x, y);
+	component->setWidth(colWidth,10);
+	component->onButtonEvent(this, &GuiApp::onPanFromButtonEvent);
+	//	component->onToggleEvent(this, &GuiApp::onPanFromLeftButtonEvent);
+	components.push_back(component);
+
+
 	y += component->getHeight() + p;
 	
 
@@ -153,7 +179,7 @@ void GuiApp::update(){
 		}
 	}
 //////////////////////////////////////////////////////////
-	if (zoom1Max > 0.0 && !autoZoomIn && !autoZoomOut ) {
+	if (zoom1Max > 0.0 && !autoZoomIn && !autoZoomOut && pan == DLPanNot) {
 		ofVec4f centerSize = calcCrop();
 		centerSize.z = ofMap(zoom1Max, 0.0, 1.0, centerSize.z, 3840.0); // width
 		centerSize.w = 2160 * centerSize.z / 3840; // height;
@@ -201,7 +227,7 @@ void GuiApp::update(){
 			updateCrop(keep);
 		}
 	}
-	else if (pan == DLPanFromLeft) {
+	else if (pan != DLPanNot) {
 		ofVec2f lastCenter(lastCenterSize.x, lastCenterSize.y);
 		ofVec2f targetCenter(panFromCenterSize.x, panFromCenterSize.y);
 		ofVec2f difference = targetCenter - lastCenter;
@@ -211,11 +237,11 @@ void GuiApp::update(){
 			lastCenterSize.z,
 			lastCenterSize.w
 		);
-		if (newCenterSize.x < panFromCenterSize.x) {
+		if (difference.length() > 0.5) {
 			updateCrop(newCenterSize);
 		}else{
 			pan = DLPanNot;
-			rtPose->detectionOn = true;
+			rtPose->startDetection();
 		}
 
 	}
@@ -225,7 +251,9 @@ void GuiApp::update(){
 	lastCenterSize.x = cropUpperLeftX + lastCenterSize.z / 2.0;
 	lastCenterSize.y = cropUpperLeftY + lastCenterSize.w / 2.0;
 
-	if (updateDetectionForPan) {
+	if (updateDetectionForPan && rtPose->currentNBody != 0) {
+//	if (updateDetectionForPan) {
+
 		calcPanStart();
 	}
 	
@@ -358,9 +386,30 @@ void GuiApp::cropToBounds() {
 
 void GuiApp::calcPanStart() {
 	panFromCenterSize = calcCrop();
-	lastCenterSize.set(panFromCenterSize.z / 2.0, panFromCenterSize.y,
+	ofVec2f start;
+	switch (pan) {
+	case DLPanFromLeft:
+		start.set(panFromCenterSize.z / 2.0, panFromCenterSize.y);
+		break;
+	case DLPanFromRight:
+		start.set(3840 - panFromCenterSize.z / 2.0, panFromCenterSize.y);
+		break;
+	case DLPanFromTop:
+		start.set(panFromCenterSize.x, panFromCenterSize.w / 2.0);
+		break;
+	case DLPanFromBottom:
+		start.set(panFromCenterSize.x, 2160 - panFromCenterSize.w / 2.0);
+		break;
+	}
+	cout << "start:" << start.x << ", " << start.y << endl;
+	if (autoZoomSpeed == 0) {
+		autoZoomSpeed = 0.5;
+		autoZoomSpeedSlider->setValue(autoZoomSpeed);
+	}
+	lastCenterSize.set(start.x, start.y, 
+	//lastCenterSize.set(panFromCenterSize.z / 2.0, panFromCenterSize.y,
 		panFromCenterSize.z, panFromCenterSize.w);
-	rtPose->detectionOn = false;
+	rtPose->stopDetection();
 	updateDetectionForPan = false;
 }
 
@@ -379,7 +428,7 @@ void GuiApp::onResetButtonEvent(ofxDatGuiButtonEvent e)
 	autoZoomCenterSize.set(1920, 1080, 3840, 2160);
 	if (autoZoomIn || autoZoomOut || pan != DLPanNot) {
 //	if (autoZoomIn || autoZoomOut ) {
-		rtPose->detectionOn = true;
+		rtPose->startDetection();
 	}
 	autoZoomIn = false;
 	autoZoomOut = false;
@@ -420,12 +469,12 @@ void GuiApp::onAutoZoomInToggleEvent(ofxDatGuiToggleEvent e)
 {
 	if (!autoZoomIn) {
 		autoZoomCenterSize = calcCrop();
-		rtPose->detectionOn = false;
+		rtPose->stopDetection();
 		autoZoomOut = false;
 		autoZoomOutToggle->setChecked(false);
 	}
 	else {
-		rtPose->detectionOn = true;
+		rtPose->startDetection();
 	}
 	autoZoomIn = e.target->getChecked();
 	
@@ -436,12 +485,12 @@ void GuiApp::onAutoZoomOutToggleEvent(ofxDatGuiToggleEvent e)
 {
 	if (!autoZoomOut) {
 		autoZoomCenterSize = ofVec4f(1920, 1080, 3480, 2160);
-		rtPose->detectionOn = false;
+		rtPose->stopDetection();
 		autoZoomIn = false;
 		autoZoomInToggle->setChecked(false);
 	}
 	else {
-		rtPose->detectionOn = true;
+		rtPose->startDetection();
 	}
 	autoZoomOut = e.target->getChecked();
 
@@ -504,20 +553,33 @@ void GuiApp::onShowBoundsToggleEvent(ofxDatGuiToggleEvent e)
 	cout << "onToggleEvent: " << e.target->getLabel() << "::" << e.target->getChecked() << endl;
 }
 
-void GuiApp::onPanFromLeftButtonEvent(ofxDatGuiButtonEvent e)
+void GuiApp::onPanFromButtonEvent(ofxDatGuiButtonEvent e)
 {
 	cout << "onButtonEvent: " << e.target->getLabel() << endl;
 
+	string label = e.target->getLabel();
+	if (label == "FROM LEFT") {
+		pan = DLPanFromLeft;
+	}
+	else if (label == "RIGHT") {
+		pan = DLPanFromRight;
+	}
+	else if (label == "TOP") {
+		pan = DLPanFromTop;
+	}
+	else if (label == "BOTTOM") {
+		pan = DLPanFromBottom;
+	}
+	
 	autoZoomIn = false;
 	autoZoomOut = false;
 	autoZoomInToggle->setChecked(false);
 	autoZoomOutToggle->setChecked(false);
-	pan = DLPanFromLeft;
 	updateDetectionForPan = false;
 
 	if (!rtPose->detectionOn) {
 		updateDetectionForPan = true;
-		rtPose->detectionOn = true;
+		rtPose->startDetection();
 		return;
 	}
 	else {

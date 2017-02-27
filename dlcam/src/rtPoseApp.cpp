@@ -182,3 +182,13 @@ void rtPoseApp::parseLatestPose() {
 		*/
 
 }
+
+void rtPoseApp::stopDetection() {
+	detectionOn = false;
+	currentNBody = 0;
+}
+
+void rtPoseApp::startDetection() {
+	detectionOn = true;
+	currentNBody = 0;
+}

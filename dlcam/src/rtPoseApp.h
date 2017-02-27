@@ -32,7 +32,8 @@ public:
 	void draw();
 	void keyPressed(int key);
 	void parseLatestPose();
-
+	void stopDetection();
+	void startDetection();
 	ofxZmqSubscriber* subscriber;
 	ofxZmqPublisher* publisher;
 
